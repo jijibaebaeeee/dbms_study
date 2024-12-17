@@ -122,6 +122,4 @@ WHERE NOT (student_math >= 30 AND student_eng >= 30 AND student_kor >=30);
 
 SELECT * FROM TBL_STUDENT;
 
-SELECT SYSDATE 
-FROM DUAL;
 

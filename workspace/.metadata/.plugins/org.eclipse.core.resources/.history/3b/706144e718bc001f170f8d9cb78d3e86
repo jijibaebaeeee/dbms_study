@@ -1,0 +1,7 @@
+-- SELECT
+-- hr 계정 내에 존재하는 employees 테이블 
+-- 107행, 11개의 컬렴(열)으로 이루어져있다
+-- 107명의 직원 데이터를 저장해 놓은 연습용 테이블
+
+
+SELECT first_name FROM EMPLOYEES;

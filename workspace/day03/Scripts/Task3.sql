@@ -1,0 +1,178 @@
+3. 아래와 같은 테이블이 있을 때 3차 정규화까지 각 단계별로 테이블을 만들고 값을 삽입 후 조회 쿼리문 결과를 확인하세요.
+
+- 기본 테이블명은 아래와 같고 테이블 추가하면서 값 넣을 땐 테이블명 달라져도 됨
+
+
+-- 직원 테이블 생성 (1차 정규화를 적용하지 않은 형태로 유지)
+CREATE TABLE Employeeees (
+    EmployeeID NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    BirthDate DATE,
+    DepartmentInfo VARCHAR2(255),
+    Salary NUMBER
+);
+
+-- 데이터 삽입
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (1, '스티븐', TO_DATE('2010-12-31', 'YYYY-MM-DD'), '영업부, 서울시.. 01234', 300);
+
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (2, '마리', TO_DATE('2011-10-01', 'YYYY-MM-DD'), '영업부, 서울시.. 01234', 250);
+
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (3, '찰스', TO_DATE('2003-05-01', 'YYYY-MM-DD'), '사업부, 경기도...02345', 200);
+
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (4, '마리아', TO_DATE('1995-08-15', 'YYYY-MM-DD'), '인사부, 서울시.. 01234', 280);
+
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (5, '제임스', TO_DATE('1988-03-22', 'YYYY-MM-DD'), '영업부, 서울시.. 01234', 320);
+
+INSERT INTO Employeeees (EmployeeID, Name, BirthDate, DepartmentInfo, Salary)
+VALUES (6, '안나', TO_DATE('2000-12-10', 'YYYY-MM-DD'), '영업부, 서울시.. 01234', 270);
+
+
+SELECT * FROM employeeees;
+
+-- 제 1 정규화
+-- 모든 행은 원자성을 만족해야한다.
+-- 모든 컬럼은 고유한 값을 가지고 모든 행은 고유한 식별자(PK)를 가진다
+
+CREATE TABLE TBL_NOR1 (
+    EmployeeID NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    BirthDate DATE,
+--  DepartmentInfo VARCHAR2(255),
+    DEPARTMENT_NAME VARCHAR2(1000), -- 부서 이름
+    ADDRESS VARCHAR2(1000), -- 주소
+    CODE VARCHAR2(1000), -- 우편번호
+    Salary NUMBER
+);
+
+INSERT INTO TBL_NOR1
+VALUES (1, '스티븐', TO_DATE('2010-12-31', 'YYYY-MM-DD'), '영업부', '서울시..', '01234', 300);
+
+INSERT INTO TBL_NOR1
+VALUES (2, '마리', TO_DATE('2011-10-01', 'YYYY-MM-DD'), '영업부', '서울시..', '01234', 250);
+
+INSERT INTO TBL_NOR1
+VALUES (3, '찰스', TO_DATE('2003-05-01', 'YYYY-MM-DD'), '사업부', '경기도...', '02345', 200);
+
+INSERT INTO TBL_NOR1
+VALUES (4, '마리아', TO_DATE('1995-08-15', 'YYYY-MM-DD'), '인사부', '서울시..' , '01234', 280);
+
+INSERT INTO TBL_NOR1
+VALUES (5, '제임스', TO_DATE('1988-03-22', 'YYYY-MM-DD'), '영업부', '서울시..', '01234', 320);
+
+INSERT INTO TBL_NOR1
+VALUES (6, '안나', TO_DATE('2000-12-10', 'YYYY-MM-DD'), '영업부', '서울시..', '01234', 270);
+
+SELECT * FROM TBL_NOR1;
+
+--DROP TABLE TBL_NOR1;
+
+
+-- 제 2 정규화
+-- 컬럼은 기본키 전체에 종속되어야한다
+CREATE TABLE TBL_NOR2_DEPARTMENTS(
+    DEPARTMENTS_NUM NUMBER PRIMARY KEY, -- 부서 번호
+	DEPARTMENT_NAME VARCHAR2(1000), -- 부서 이름
+    ADDRESS VARCHAR2(1000), -- 주소
+    CODE VARCHAR2(1000) -- 우편번호
+);
+
+
+CREATE TABLE TBL_NOR2_EMPLOYEES (
+    EmployeeID NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    BirthDate DATE,
+--  DepartmentInfo VARCHAR2(255),
+    DEPARTMENTS_NUM NUMBER,
+    Salary NUMBER,
+    CONSTRAINT FK_NOR2 FOREIGN KEY(DEPARTMENTS_NUM) REFERENCES TBL_NOR2_DEPARTMENTS(DEPARTMENTS_NUM)
+);
+
+INSERT INTO TBL_NOR2_DEPARTMENTS
+--VALUES(1, '영업부', '서울시..', 01234);
+--VALUES(2, '사업부', '경기도...', '02345');
+VALUES(3, '인사부', '서울시..' , '01234');
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES(1, '스티븐', TO_DATE('2010-12-31', 'YYYY-MM-DD'), 1, 300);
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES (2, '마리', TO_DATE('2011-10-01', 'YYYY-MM-DD'), 1, 250);
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES (3, '찰스', TO_DATE('2003-05-01', 'YYYY-MM-DD'), 2, 200);
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES (4, '마리아', TO_DATE('1995-08-15', 'YYYY-MM-DD'), 3, 280);
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES (5, '제임스', TO_DATE('1988-03-22', 'YYYY-MM-DD'), 1, 320);
+
+INSERT INTO TBL_NOR2_EMPLOYEES
+VALUES (6, '안나', TO_DATE('2000-12-10', 'YYYY-MM-DD'), 1, 270);
+
+SELECT * FROM TBL_NOR2_DEPARTMENTS;
+
+SELECT * FROM TBL_NOR2_EMPLOYEES;
+
+
+-- 제 3 정규형
+-- 기본키가 아닌 컬럼이 다른 컬럼을 결정하는 경우
+-- 종속성을 지운다
+
+CREATE TABLE TBL_NOR3_DEPARMENT_ADDRESS(
+    ADDRESS_NUM NUMBER PRIMARY KEY, -- 주소번호
+    ADDRESS VARCHAR2(1000), -- 주소
+    CODE VARCHAR2(1000) -- 우편번호
+);
+
+
+CREATE TABLE TBL_NOR3_DEPARTMENTS(
+    DEPARTMENTS_NUM NUMBER PRIMARY KEY, -- 부서 번호
+	DEPARTMENT_NAME VARCHAR2(1000), -- 부서 이름
+    ADDRESS_NUM NUMBER, -- 주소번호
+    CONSTRAINT FK_ADDRESS FOREIGN KEY(ADDRESS_NUM) REFERENCES TBL_NOR3_DEPARMENT_ADDRESS(ADDRESS_NUM)
+);
+
+
+CREATE TABLE TBL_NOR3_EMPLOYEES (
+    EmployeeID NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    BirthDate DATE,
+--  DepartmentInfo VARCHAR2(255),
+    DEPARTMENTS_NUM NUMBER,
+    Salary NUMBER,
+    CONSTRAINT FK_NOR3 FOREIGN KEY(DEPARTMENTS_NUM) REFERENCES TBL_NOR3_DEPARTMENTS(DEPARTMENTS_NUM)
+);
+
+INSERT INTO TBL_NOR3_DEPARMENT_ADDRESS
+--VALUES(1, '서울시..', '01234');
+--VALUES(2, '경기도...', '02345');
+VALUES(3, '서울시..', '01234');
+
+INSERT INTO  TBL_NOR3_DEPARTMENTS
+--VALUES(1, '영업부', 1);
+--VALUES(2, '사업부', 2);
+VALUES(3, '인사부', 3);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES(1, '스티븐', TO_DATE('2010-12-31', 'YYYY-MM-DD'), 1, 300);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES (2, '마리', TO_DATE('2011-10-01', 'YYYY-MM-DD'), 1, 250);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES (3, '찰스', TO_DATE('2003-05-01', 'YYYY-MM-DD'), 2, 200);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES (4, '마리아', TO_DATE('1995-08-15', 'YYYY-MM-DD'), 3, 280);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES (5, '제임스', TO_DATE('1988-03-22', 'YYYY-MM-DD'), 1, 320);
+
+INSERT INTO TBL_NOR3_EMPLOYEES
+VALUES (6, '안나', TO_DATE('2000-12-10', 'YYYY-MM-DD'), 1, 270);
